@@ -4,9 +4,14 @@ import pa.pro.pa_diplom.model.Tweet;
 import pa.pro.pa_diplom.model.TweetFeed;
 import pa.pro.pa_diplom.model.User;
 import pa.pro.pa_diplom.model.UserFeed;
+import pa.pro.pa_diplom.persistance.TweetDao;
+import pa.pro.pa_diplom.persistance.TweetDaoInMemImpl;
+import pa.pro.pa_diplom.persistance.UserDao;
+import pa.pro.pa_diplom.persistance.UserDaoInMemImpl;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class DemoRunner {
     public static void main(String[] args) {
@@ -21,8 +26,24 @@ public class DemoRunner {
         UserFeed myFeed = new UserFeed(Arrays.asList(tweet, tweetReply2), me.getUserId(), true);
         TweetFeed myTweetFeed = new TweetFeed(Arrays.asList(tweetReply1,tweetReply2), tweet.getTweetId());
 
-        System.out.println(myFeed);
-        System.out.println(myTweetFeed);
+
+        UserDao UserDao = new UserDaoInMemImpl();
+        TweetDao TweetDao = new TweetDaoInMemImpl();
+        TweetDao.saveTweet(tweet);
+        TweetDao.saveTweet(tweetReply1);
+        UserDao.save(me);
+        UserDao.save(him);
+
+        me.setAbout("Hello LoL");
+
+        Optional<User> oldMe = UserDao.findUserById(me.getUserId());
+       // Optional<Tweet> newTweets = TweetDao.findTweetById(tweet.getTweetId());
+        System.out.println(oldMe);
+        System.out.println(me);
+
+        System.out.println(tweet.getContent());
+        System.out.println(tweetReply1.getContent());
+
 
     }
 

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class User {
 
-    private static long userIdSequence = 0;
+
 
     private Long userId;
     private String nickname;
@@ -17,8 +17,9 @@ public class User {
     private List<User> followers;
     private List<User> following;
 
+
+
     public User(String nickname, LocalDate dateOfBirth, String about) {
-        this.userId = ++userIdSequence;
         this.nickname = nickname;
         this.dateRegistered = LocalDate.now();
         this.dateOfBirth = dateOfBirth;
@@ -27,13 +28,25 @@ public class User {
         this.following = new ArrayList<>();
     }
 
-    public User(String nickname) {
-        this.userId = ++userIdSequence;
+    public User (String nickname) {
+
         this.nickname = nickname;
         this.dateRegistered = LocalDate.now();
         this.followers = new ArrayList<>();
         this.following = new ArrayList<>();
     }
+
+    public User (User other) {
+        this.userId = other.userId;
+        this.nickname = other.nickname;
+        this.dateRegistered = other.dateRegistered;
+        this.dateOfBirth = other.dateOfBirth;
+        this.about = other.about;
+        this.followers = other.followers;
+        this.following = other.following;
+    }
+
+
 
     public Long getUserId() {
         return userId;

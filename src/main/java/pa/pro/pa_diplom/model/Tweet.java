@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Tweet {
 
-    private static long tweetSequence = 0;
+
 
     private Long tweetId;
     private Long userId;
@@ -17,7 +17,7 @@ public class Tweet {
     private List<Tweet> retweets;
 
     public Tweet(Long userId, Tweet referenceTweet, String content) {
-        this.tweetId = ++tweetSequence;
+
         this.userId = userId;
         this.referenceTweet = referenceTweet;
         this.datePosted = LocalDate.now();
@@ -26,6 +26,19 @@ public class Tweet {
         this.likes = new ArrayList<>();
         this.retweets = new ArrayList<>();
     }
+
+    public Tweet(Tweet other) {
+        this.tweetId = other.tweetId;
+        this.userId = other.userId;
+        this.referenceTweet = other.referenceTweet;
+        this.datePosted = other.datePosted;
+        this.content = other.content;
+        this.mentionedUsers = other.mentionedUsers;
+        this.likes = other.likes;
+        this.retweets = other.retweets;
+    }
+
+
 
     private List<User> parseContentForMentions(String content) {
         return Collections.emptyList();
