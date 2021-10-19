@@ -8,9 +8,13 @@ import pa.pro.pa_diplom.persistance.TweetDao;
 import pa.pro.pa_diplom.persistance.TweetDaoInMemImpl;
 import pa.pro.pa_diplom.persistance.UserDao;
 import pa.pro.pa_diplom.persistance.UserDaoInMemImpl;
+import pa.pro.pa_diplom.service.UserService;
+import pa.pro.pa_diplom.service.UserServiceImpl;
+import pa.pro.pa_diplom.storage.Storage;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 public class DemoRunner {
@@ -28,21 +32,25 @@ public class DemoRunner {
 
 
         UserDao UserDao = new UserDaoInMemImpl();
+        UserService userService = new UserServiceImpl(UserDao);
         TweetDao TweetDao = new TweetDaoInMemImpl();
         TweetDao.saveTweet(tweet);
         TweetDao.saveTweet(tweetReply1);
-        UserDao.save(me);
-        UserDao.save(him);
+        userService.createUser(me);
+        userService.createUser(him);
 
         me.setAbout("Hello LoL");
 
-        Optional<User> oldMe = UserDao.findUserById(me.getUserId());
+        Optional<User> oldMe = userService.findUserById(me.getUserId());
        // Optional<Tweet> newTweets = TweetDao.findTweetById(tweet.getTweetId());
         System.out.println(oldMe);
         System.out.println(me);
 
         System.out.println(tweet.getContent());
         System.out.println(tweetReply1.getContent());
+
+
+        Map<Long, Tweet> storage = Storage.getTweetStorage();
 
 
     }
