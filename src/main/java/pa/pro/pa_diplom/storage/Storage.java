@@ -11,27 +11,30 @@ public class Storage {
 
     public static long userIdSequence = 0;
     public static long tweetSequence = 0;
+    private static final Map<Long, User> userStorage = new HashMap<>();
+    private static final Map<Long, Tweet> tweetStorage = new HashMap<>();
 
     private Storage() {
 
     }
 
+    public static Storage getInstance(){
+        return Holder.instance;
+    }
+
     public static Map<Long, User> getUserStorage(){
-        return userStorageHolder.userStorage;
+        return userStorage;
     }
     public static Map<Long, Tweet> getTweetStorage(){
-        return tweetStorageHolder.tweetStorage;
+        return tweetStorage;
     }
 
-    private static class userStorageHolder {
-        private static final Map<Long, User> userStorage = new HashMap<>();
+    private static class Holder {
+       private static final Storage instance = new Storage();
 
     }
 
-    private static class tweetStorageHolder {
-        private static final Map<Long, Tweet> tweetStorage = new HashMap<>();
 
-    }
 
 
 

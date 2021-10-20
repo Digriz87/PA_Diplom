@@ -50,7 +50,11 @@ public class DemoRunner {
         System.out.println(tweetReply1.getContent());
 
 
-        Map<Long, Tweet> storage = Storage.getTweetStorage();
+        Storage storage = Storage.getInstance();
+
+        System.out.println(storage);
+
+
 
 
     }
