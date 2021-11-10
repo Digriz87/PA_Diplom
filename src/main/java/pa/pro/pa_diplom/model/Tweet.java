@@ -1,5 +1,6 @@
 package pa.pro.pa_diplom.model;
 
+import javax.swing.text.AbstractDocument;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -10,9 +11,9 @@ public class Tweet {
     private Long tweetId;
     private Long userId;
     private Tweet referenceTweet;
-    private final LocalDate datePosted;
-    private final String content;
-    private final List<User> mentionedUsers;
+    private  LocalDate datePosted;
+    private  String content;
+    private  List<User> mentionedUsers;
     private List<User> likes;
     private List<Tweet> retweets;
 
@@ -38,7 +39,17 @@ public class Tweet {
         this.retweets = other.retweets;
     }
 
+    public Tweet() {
 
+    }
+
+    public void setDatePosted(LocalDate datePosted) {
+        this.datePosted = datePosted;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     private List<User> parseContentForMentions(String content) {
         return Collections.emptyList();
@@ -119,4 +130,6 @@ public class Tweet {
                 ", content='" + content + '\'' +
                 '}';
     }
+
+
 }

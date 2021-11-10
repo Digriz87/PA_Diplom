@@ -1,5 +1,6 @@
 package pa.pro.pa_diplom.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class User {
 
     private Long userId;
     private String nickname;
-    private final LocalDate dateRegistered;
+    private LocalDate dateRegistered;
     private LocalDate dateOfBirth;
     private String about;
     private List<User> followers;
@@ -19,7 +20,8 @@ public class User {
 
 
 
-    public User(String nickname, LocalDate dateOfBirth, String about) {
+    public User(Long userId, String nickname, Timestamp timestamp, LocalDate dateOfBirth, String about) {
+        this.userId = userId;
         this.nickname = nickname;
         this.dateRegistered = LocalDate.now();
         this.dateOfBirth = dateOfBirth;
@@ -46,6 +48,9 @@ public class User {
         this.following = other.following;
     }
 
+    public User() {
+
+    }
 
 
     public Long getUserId() {
