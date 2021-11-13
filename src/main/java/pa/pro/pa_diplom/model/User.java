@@ -1,5 +1,6 @@
 package pa.pro.pa_diplom.model;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,18 +14,18 @@ public class User {
     private Long userId;
     private String nickname;
     private LocalDate dateRegistered;
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
     private String about;
     private List<User> followers;
     private List<User> following;
 
 
 
-    public User(Long userId, String nickname, Timestamp timestamp, LocalDate dateOfBirth, String about) {
+    public User(Long userId, LocalDate dateRegistered, String nickname, String dateOfBirth, String about) {
         this.userId = userId;
         this.nickname = nickname;
-        this.dateRegistered = LocalDate.now();
         this.dateOfBirth = dateOfBirth;
+        this.dateRegistered = LocalDate.now();
         this.about = about;
         this.followers = new ArrayList<>();
         this.following = new ArrayList<>();
@@ -73,12 +74,15 @@ public class User {
         return dateRegistered;
     }
 
+    public void setDateRegistered(LocalDate dateRegistered) {
+        this.dateRegistered = dateRegistered;
+    }
 
-    public LocalDate getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -125,6 +129,7 @@ public class User {
                 "userId=" + userId +
                 ", nickname='" + nickname + '\'' +
                 ", dateRegistered=" + dateRegistered +
+                ", dateOfBirth='" + dateOfBirth + '\'' +
                 ", about='" + about + '\'' +
                 '}';
     }

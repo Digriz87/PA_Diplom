@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public class UserDaoInMemImpl implements UserDao {
 
+
+
     @Override
     public Long save(User user) {
         long newUserId = ++Storage.userIdSequence;
