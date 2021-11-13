@@ -6,54 +6,42 @@ import pa.pro.pa_diplom.model.User;
 import pa.pro.pa_diplom.model.UserFeed;
 import pa.pro.pa_diplom.persistance.TweetDao;
 import pa.pro.pa_diplom.persistance.TweetDaoInMemImpl;
-import pa.pro.pa_diplom.persistance.UserDao;
-import pa.pro.pa_diplom.persistance.UserDaoInMemImpl;
-import pa.pro.pa_diplom.service.UserService;
-import pa.pro.pa_diplom.service.UserServiceImpl;
-import pa.pro.pa_diplom.storage.Storage;
+import pa.pro.pa_diplom.persistance.jdbc.TweetDaoJdbcImpl;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Optional;
+
 
 public class DemoRunner {
     public static void main(String[] args) {
+        TweetDaoJdbcImpl tweetDaoJdbc = new TweetDaoJdbcImpl();
 
-       /* User me = new User("Slava", new Timestamp(System.currentTimeMillis()), LocalDate.of(1987, 10,4), "Student");
-       // User him = new User("Kostya", new Timestamp(System.currentTimeMillis()), LocalDate.of(1990, 2,10), "Teacher");
+        User bilbo = new User(1L, LocalDate.now(), "Bilbo", "1987-12-12", "I was first of owner ring");
+        User legolas = new User(5L, LocalDate.now(), "Legolas", "1987-12-12", "Nay, time does not tarry ever, but change and growth is not in all things and places alike");
+        User frodo = new User(2L, LocalDate.now(), "Frodo", "1987-12-12", "I`m second of owner ring");
+        User sauron = new User(4L, LocalDate.now(), "Sauron", "1987-12-12", "Lord");
 
-        //Tweet tweet = new Tweet(me.getUserId(), null, "Hello everyones");
-        // Tweet tweetReply1 = new Tweet(him.getUserId(), tweet, "Hello Slavik");
-        // Tweet tweetReply2 = new Tweet(me.getUserId(), tweetReply1, "You too");
+        Tweet tweet = new Tweet(bilbo.getUserId(), null, "Hello everyones");
+        Tweet tweetReply1 = new Tweet(legolas.getUserId(), 1L, "Hello a little guy");
+        Tweet tweetReply2 = new Tweet(bilbo.getUserId(), 2L, "Ha-ha LoL");
+        Tweet tweetReply3 = new Tweet(frodo.getUserId(), 3L, "Bilbo you are very old, you need a rest");
+        Tweet tweetReply4 = new Tweet(sauron.getUserId(), 4L, "You cannot hide. I see you. There is no life in the void, only death");
 
-        // UserFeed myFeed = new UserFeed(Arrays.asList(tweet, tweetReply2), me.getUserId(), true);
-        // TweetFeed myTweetFeed = new TweetFeed(Arrays.asList(tweetReply1,tweetReply2), tweet.getTweetId());
-
-
-        UserDao UserDao = new UserDaoInMemImpl();
-        UserService userService = new UserServiceImpl(UserDao);
-        TweetDao TweetDao = new TweetDaoInMemImpl();
-        //  TweetDao.saveTweet(tweet);
-        // TweetDao.saveTweet(tweetReply1);
-        // userService.createUser(me);
-        // userService.createUser(him);
-//
-        //me.setAbout("Hello LoL");
-
-        //  Optional<User> oldMe = userService.findUserById(me.getUserId());
-       // Optional<Tweet> newTweets = TweetDao.findTweetById(tweet.getTweetId());
-        //System.out.println(oldMe);
-        // System.out.println(me);
-
-        // System.out.println(tweet.getContent());
-        // System.out.println(tweetReply1.getContent());
+        TweetDao tweetDao = new TweetDaoInMemImpl();
+        tweetDao.saveTweet(tweet);
+        tweetDao.saveTweet(tweetReply1);
+        tweetDao.saveTweet(tweetReply2);
+        tweetDao.saveTweet(tweetReply3);
+        tweetDao.saveTweet(tweetReply4);
 
 
-        Storage storage = Storage.getInstance();
+        tweetDaoJdbc.saveTweet(tweet);
+        tweetDaoJdbc.saveTweet(tweetReply1);
+        tweetDaoJdbc.saveTweet(tweetReply2);
+        tweetDaoJdbc.saveTweet(tweetReply3);
+        tweetDaoJdbc.saveTweet(tweetReply4);
 
-        System.out.println(storage);*/
-
+        System.out.println(tweetDaoJdbc.findTweetById(3));
+        System.out.println(tweetDaoJdbc.getAll());
 
 
 

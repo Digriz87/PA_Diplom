@@ -3,19 +3,22 @@ package pa.pro.pa_diplom.persistance.jdbc;
 import pa.pro.pa_diplom.model.User;
 import pa.pro.pa_diplom.persistance.UserDao;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class UserDaoJdbcImpl implements UserDao {
-    private static final String getLastId = "SELECT MAX(userId) FROM user";
-    private static final String DELETE = "DELETE FROM user WHERE userId=?";
-    private static final String FIND_ALL = "SELECT * FROM user ORDER BY userId";
-    private static final String FIND_BY_ID = "SELECT * FROM user WHERE userId=?";
-    private static final String INSERT = "INSERT INTO user(nickname, dateRegistered, dateOfBirth, about) VALUES(?, ?, ?, ?)";
-    private static final String UPDATE = "UPDATE user SET nickname=?, dateRegistered=?, dateOfBirth=?, about=? WHERE userId=?";
-    private static final String url = "jdbc:sqlite:twitter_db";
+
+    DbUtils dbUtils = new DbUtils();
+    private static Logger log = Logger.getLogger(UserDaoJdbcImpl.class.getName());
+
 
     @Override
     public Long save(User user) {
@@ -26,17 +29,17 @@ public class UserDaoJdbcImpl implements UserDao {
         ResultSet rs = null;
 
         try {
-            connection = getConnection();
-            statement1 = connection.prepareStatement(INSERT);
+            connection = dbUtils.getConnection();
+            statement1 = connection.prepareStatement(dbUtils.INSERT_USER);
             statement1.setString(1, user.getNickname());
-            statement1.setString(2, String.valueOf(user.getDateRegistered()));
-            statement1.setString(3, String.valueOf(user.getDateOfBirth()));
+            statement1.setDate(2, Date.valueOf(user.getDateRegistered()));
+            statement1.setString(3, user.getDateOfBirth());
             statement1.setString(4, user.getAbout());
             int result = statement1.executeUpdate();
-            System.out.println(result);
+            log.info(String.valueOf(result));
             if (result == 1) {
                 statement2 = connection.createStatement();
-                rs = statement2.executeQuery(getLastId);
+                rs = statement2.executeQuery(dbUtils.getLastId_USER);
                 if (rs.next()) {
                     return rs.getLong(1);
                 }
@@ -45,16 +48,9 @@ public class UserDaoJdbcImpl implements UserDao {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            try {
-                rs.close();
-                statement1.close();
-                statement2.close();
-                connection.close();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-            return null;
-        }
+            dbUtils.closeRsStSt2Cn(rs,statement1,statement2,connection);
+
+        }return null;
     }
 
     @Override
@@ -62,28 +58,30 @@ public class UserDaoJdbcImpl implements UserDao {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        User user = null;
         try {
-            conn = getConnection();
-            stmt = conn.prepareStatement(FIND_BY_ID);
+            conn = dbUtils.getConnection();
+            stmt = conn.prepareStatement(dbUtils.FIND_BY_ID_USER);
             stmt.setLong(1, userId);
             rs = stmt.executeQuery();
 
             if (rs.next()) {
-                User user = new User();
+                user = new User();
                 user.setUserId(rs.getLong("userId"));
                 user.setNickname(rs.getString("nickname"));
                 user.setAbout(rs.getString("about"));
-
-                return Optional.of(user);
+                user.setDateOfBirth(rs.getString("dateOfBirth"));
+                user.setDateRegistered(LocalDate.ofEpochDay(rs.getLong("dateRegistered")));
             } else {
                 return null;
             }
         } catch (SQLException e) {
+            e.printStackTrace();
 
-            throw new RuntimeException(e);
         } finally {
-            oneMethodToCloseThemAll(rs,stmt,conn);
+            dbUtils.closeRsStCn(rs, stmt, conn);
         }
+        return Optional.ofNullable(user);
     }
 
     @Override
@@ -92,9 +90,11 @@ public class UserDaoJdbcImpl implements UserDao {
         PreparedStatement stmt = null;
         List<User> list = new ArrayList<>();
         ResultSet rs = null;
+
+
         try {
-            conn = getConnection();
-            stmt = conn.prepareStatement(FIND_ALL);
+            conn = dbUtils.getConnection();
+            stmt = conn.prepareStatement(dbUtils.FIND_ALL_USER);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -102,15 +102,15 @@ public class UserDaoJdbcImpl implements UserDao {
                 user.setUserId(rs.getLong("userId"));
                 user.setNickname(rs.getString("nickname"));
                 user.setAbout(rs.getString("about"));
-                user.setDateOfBirth(LocalDate.parse(rs.getString("dateOfBirth")));
-
+                user.setDateOfBirth((rs.getString("dateOfBirth")));
+                user.setDateRegistered(LocalDate.ofEpochDay(rs.getLong("dateRegistered")));
                 list.add(user);
             }
         } catch (SQLException e) {
+            e.printStackTrace();
 
-            throw new RuntimeException(e);
         } finally {
-            oneMethodToCloseThemAll(rs,stmt,conn);
+            dbUtils.closeRsStCn(rs,stmt,conn);
         }
         return list;
     }
@@ -121,25 +121,20 @@ public class UserDaoJdbcImpl implements UserDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = getConnection();
-            stmt = conn.prepareStatement(UPDATE);
+            conn = dbUtils.getConnection();
+            stmt = conn.prepareStatement(dbUtils.UPDATE_USER);
             stmt.setString(1, user.getNickname());
-            stmt.setString(2, String.valueOf(user.getDateRegistered()));
-            stmt.setString(3, String.valueOf(user.getDateOfBirth()));
+            stmt.setDate(2, Date.valueOf(user.getDateRegistered()));
+            stmt.setString(3, user.getDateOfBirth());
             stmt.setString(4, user.getAbout());
             stmt.setLong(5, user.getUserId());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
+            e.printStackTrace();
 
-            throw new RuntimeException(e);
         } finally {
-            try {
-                stmt.close();
-                conn.close();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+            dbUtils.closeRsStCn(null,stmt,conn);
         }
     }
 
@@ -149,75 +144,19 @@ public class UserDaoJdbcImpl implements UserDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = getConnection();
-            stmt = conn.prepareStatement(DELETE);
+            conn = dbUtils.getConnection();
+            stmt = conn.prepareStatement(dbUtils.DELETE_USER);
             stmt.setLong(1, userId);
             stmt.executeUpdate();
-            return true;
+
+            return  stmt.executeUpdate() == 1;
         } catch (SQLException e) {
+            e.printStackTrace();
 
-            throw new RuntimeException(e);
         } finally {
-            try {
-                stmt.close();
-                conn.close();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-
+            dbUtils.closeRsStCn(null,stmt,conn);
         }
+        return true;
     }
 
-    private Connection getConnection() {
-        try {
-            return DriverManager.getConnection(url);
-        } catch (Exception e) {
-
-            throw new RuntimeException(e);
-        }
-    }
-    public void oneMethodToCloseThemAll(ResultSet resultSet, Statement statement, Connection connection) {
-        if (resultSet != null) {
-            try {
-                if (!resultSet.isClosed()) {
-                    resultSet.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if (statement != null) {
-            try {
-                if (!statement.isClosed()) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (connection != null) {
-            try {
-                if (!connection.isClosed()) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-
-        UserDaoJdbcImpl userDaoJdbc = new UserDaoJdbcImpl();
-         User me = new User(null,"Slava", new Timestamp(System.currentTimeMillis()), LocalDate.of(1987, 10,4), "Student");
-
-       // User newMe = new User(5L, "Legolas", new Timestamp(System.currentTimeMillis()), LocalDate.of(1980, 10, 4), "Nay, time does not tarry ever, but change and growth is not in all things and places alike");
-        // userDaoJdbc.save(me);
-       //userDaoJdbc.updateUser(newMe);
-       // System.out.println(userDaoJdbc.findUserById(5));
-        // System.out.println(userDaoJdbc.getAll());
-        userDaoJdbc.deleteUserById(7);
-
-    }
 }

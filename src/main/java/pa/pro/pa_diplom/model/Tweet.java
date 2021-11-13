@@ -10,14 +10,14 @@ public class Tweet {
 
     private Long tweetId;
     private Long userId;
-    private Tweet referenceTweet;
+    private Long referenceTweet;
     private  LocalDate datePosted;
     private  String content;
     private  List<User> mentionedUsers;
     private List<User> likes;
     private List<Tweet> retweets;
 
-    public Tweet(Long userId, Tweet referenceTweet, String content) {
+    public Tweet(Long userId, Long referenceTweet, String content) {
 
         this.userId = userId;
         this.referenceTweet = referenceTweet;
@@ -71,11 +71,11 @@ public class Tweet {
         this.userId = userId;
     }
 
-    public Tweet getReferenceTweet() {
+    public Long getReferenceTweet() {
         return referenceTweet;
     }
 
-    public void setReferenceTweet(Tweet referenceTweet) {
+    public void setReferenceTweet(Long referenceTweet) {
         this.referenceTweet = referenceTweet;
     }
 
