@@ -16,9 +16,7 @@ import java.util.logging.Logger;
 
 public class UserDaoJdbcImpl implements UserDao {
 
-    DbUtils dbUtils = new DbUtils();
     private static Logger log = Logger.getLogger(UserDaoJdbcImpl.class.getName());
-
 
     @Override
     public Long save(User user) {
@@ -29,17 +27,17 @@ public class UserDaoJdbcImpl implements UserDao {
         ResultSet rs = null;
 
         try {
-            connection = dbUtils.getConnection();
-            statement1 = connection.prepareStatement(dbUtils.INSERT_USER);
+            connection = DbUtils.getConnection();
+            statement1 = connection.prepareStatement(DbUtils.INSERT_USER);
             statement1.setString(1, user.getNickname());
             statement1.setDate(2, Date.valueOf(user.getDateRegistered()));
-            statement1.setString(3, user.getDateOfBirth());
+            statement1.setDate(3, Date.valueOf(user.getDateOfBirth()));
             statement1.setString(4, user.getAbout());
             int result = statement1.executeUpdate();
             log.info(String.valueOf(result));
             if (result == 1) {
                 statement2 = connection.createStatement();
-                rs = statement2.executeQuery(dbUtils.getLastId_USER);
+                rs = statement2.executeQuery(DbUtils.getLastId_USER);
                 if (rs.next()) {
                     return rs.getLong(1);
                 }
@@ -48,7 +46,8 @@ public class UserDaoJdbcImpl implements UserDao {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            dbUtils.closeRsStSt2Cn(rs,statement1,statement2,connection);
+            DbUtils.closeResource(rs,statement1,connection);
+           //dbUtils.c(;
 
         }return null;
     }
@@ -60,8 +59,8 @@ public class UserDaoJdbcImpl implements UserDao {
         ResultSet rs = null;
         User user = null;
         try {
-            conn = dbUtils.getConnection();
-            stmt = conn.prepareStatement(dbUtils.FIND_BY_ID_USER);
+            conn = DbUtils.getConnection();
+            stmt = conn.prepareStatement(DbUtils.FIND_BY_ID_USER);
             stmt.setLong(1, userId);
             rs = stmt.executeQuery();
 
@@ -70,7 +69,7 @@ public class UserDaoJdbcImpl implements UserDao {
                 user.setUserId(rs.getLong("userId"));
                 user.setNickname(rs.getString("nickname"));
                 user.setAbout(rs.getString("about"));
-                user.setDateOfBirth(rs.getString("dateOfBirth"));
+                user.setDateOfBirth(LocalDate.ofEpochDay(rs.getLong("dateOfBirth")));
                 user.setDateRegistered(LocalDate.ofEpochDay(rs.getLong("dateRegistered")));
             } else {
                 return null;
@@ -79,7 +78,7 @@ public class UserDaoJdbcImpl implements UserDao {
             e.printStackTrace();
 
         } finally {
-            dbUtils.closeRsStCn(rs, stmt, conn);
+            DbUtils.closeResource(rs, stmt, conn);
         }
         return Optional.ofNullable(user);
     }
@@ -93,8 +92,8 @@ public class UserDaoJdbcImpl implements UserDao {
 
 
         try {
-            conn = dbUtils.getConnection();
-            stmt = conn.prepareStatement(dbUtils.FIND_ALL_USER);
+            conn = DbUtils.getConnection();
+            stmt = conn.prepareStatement(DbUtils.FIND_ALL_USER);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -102,7 +101,7 @@ public class UserDaoJdbcImpl implements UserDao {
                 user.setUserId(rs.getLong("userId"));
                 user.setNickname(rs.getString("nickname"));
                 user.setAbout(rs.getString("about"));
-                user.setDateOfBirth((rs.getString("dateOfBirth")));
+                user.setDateOfBirth(LocalDate.parse(rs.getString("dateOfBirth")));
                 user.setDateRegistered(LocalDate.ofEpochDay(rs.getLong("dateRegistered")));
                 list.add(user);
             }
@@ -110,7 +109,7 @@ public class UserDaoJdbcImpl implements UserDao {
             e.printStackTrace();
 
         } finally {
-            dbUtils.closeRsStCn(rs,stmt,conn);
+            DbUtils.closeResource(rs,stmt,conn);
         }
         return list;
     }
@@ -121,11 +120,11 @@ public class UserDaoJdbcImpl implements UserDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = dbUtils.getConnection();
-            stmt = conn.prepareStatement(dbUtils.UPDATE_USER);
+            conn = DbUtils.getConnection();
+            stmt = conn.prepareStatement(DbUtils.UPDATE_USER);
             stmt.setString(1, user.getNickname());
             stmt.setDate(2, Date.valueOf(user.getDateRegistered()));
-            stmt.setString(3, user.getDateOfBirth());
+            stmt.setDate(3, Date.valueOf(user.getDateOfBirth()));
             stmt.setString(4, user.getAbout());
             stmt.setLong(5, user.getUserId());
             stmt.executeUpdate();
@@ -134,7 +133,7 @@ public class UserDaoJdbcImpl implements UserDao {
             e.printStackTrace();
 
         } finally {
-            dbUtils.closeRsStCn(null,stmt,conn);
+            DbUtils.closeResource(null,stmt,conn);
         }
     }
 
@@ -144,8 +143,8 @@ public class UserDaoJdbcImpl implements UserDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = dbUtils.getConnection();
-            stmt = conn.prepareStatement(dbUtils.DELETE_USER);
+            conn = DbUtils.getConnection();
+            stmt = conn.prepareStatement(DbUtils.DELETE_USER);
             stmt.setLong(1, userId);
             stmt.executeUpdate();
 
@@ -154,7 +153,7 @@ public class UserDaoJdbcImpl implements UserDao {
             e.printStackTrace();
 
         } finally {
-            dbUtils.closeRsStCn(null,stmt,conn);
+            DbUtils.closeResource(null,stmt,conn);
         }
         return true;
     }

@@ -14,14 +14,14 @@ public class User {
     private Long userId;
     private String nickname;
     private LocalDate dateRegistered;
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
     private String about;
     private List<User> followers;
     private List<User> following;
 
 
 
-    public User(Long userId, LocalDate dateRegistered, String nickname, String dateOfBirth, String about) {
+    public User(Long userId, LocalDate dateRegistered, String nickname, LocalDate dateOfBirth, String about) {
         this.userId = userId;
         this.nickname = nickname;
         this.dateOfBirth = dateOfBirth;
@@ -78,11 +78,11 @@ public class User {
         this.dateRegistered = dateRegistered;
     }
 
-    public String getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

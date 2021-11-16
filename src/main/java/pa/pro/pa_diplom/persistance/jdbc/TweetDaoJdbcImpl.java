@@ -1,9 +1,7 @@
 package pa.pro.pa_diplom.persistance.jdbc;
 
 import pa.pro.pa_diplom.model.Tweet;
-import pa.pro.pa_diplom.model.User;
 import pa.pro.pa_diplom.persistance.TweetDao;
-import pa.pro.pa_diplom.persistance.TweetDaoInMemImpl;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -14,8 +12,6 @@ import java.util.logging.Logger;
 
 public class TweetDaoJdbcImpl implements TweetDao {
 
-
-    DbUtils dbUtils = new DbUtils();
     private static Logger log = Logger.getLogger(TweetDaoJdbcImpl.class.getName());
 
     @Override
@@ -26,13 +22,13 @@ public class TweetDaoJdbcImpl implements TweetDao {
         ResultSet rs = null;
 
         try {
-            connection = dbUtils.getConnection();
-            statement1 = connection.prepareStatement(dbUtils.INSERT_TWEET);
+            connection = DbUtils.getConnection();
+            statement1 = connection.prepareStatement(DbUtils.INSERT_TWEET);
             statement1.setLong(1, tweet.getUserId());
-            if (tweet.getReferenceTweet() == null) {
+            if (tweet.getReferenceTweetId() == null) {
                 statement1.setNull(2, java.sql.Types.INTEGER);
             } else {
-                statement1.setLong(2, tweet.getReferenceTweet());
+                statement1.setLong(2, tweet.getReferenceTweetId());
             }
 
             statement1.setString(3, String.valueOf(tweet.getDatePosted()));
@@ -41,7 +37,7 @@ public class TweetDaoJdbcImpl implements TweetDao {
             log.info(String.valueOf(result));
             if (result == 1) {
                 statement2 = connection.createStatement();
-                rs = statement2.executeQuery(dbUtils.getLastId_TWEET);
+                rs = statement2.executeQuery(DbUtils.getLastId_TWEET);
                 if (rs.next()) {
                     return rs.getLong(1);
                 }
@@ -49,7 +45,7 @@ public class TweetDaoJdbcImpl implements TweetDao {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            dbUtils.closeRsStSt2Cn(rs, statement1, statement2, connection);
+            DbUtils.closeResource(rs, statement1, connection);
 
         }
         return null;
@@ -61,8 +57,8 @@ public class TweetDaoJdbcImpl implements TweetDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = dbUtils.getConnection();
-            stmt = conn.prepareStatement(dbUtils.FIND_BY_ID_TWEET);
+            conn = DbUtils.getConnection();
+            stmt = conn.prepareStatement(DbUtils.FIND_BY_ID_TWEET);
             stmt.setLong(1, tweetId);
             rs = stmt.executeQuery();
 
@@ -72,7 +68,7 @@ public class TweetDaoJdbcImpl implements TweetDao {
                 tweet.setUserId(rs.getLong("userId"));
                 tweet.setContent(rs.getString("content"));
                 tweet.setDatePosted(LocalDate.parse(rs.getString("datePosted")));
-                tweet.setReferenceTweet(rs.getLong("referenceTweet"));
+                tweet.setReferenceTweetId(rs.getLong("referenceTweet"));
                 return Optional.of(tweet);
             } else {
                 return Optional.empty();
@@ -81,7 +77,7 @@ public class TweetDaoJdbcImpl implements TweetDao {
 
             throw new RuntimeException(e);
         } finally {
-            dbUtils.closeRsStCn(rs, stmt, conn);
+            DbUtils.closeResource(rs, stmt, conn);
         }
     }
 
@@ -92,8 +88,8 @@ public class TweetDaoJdbcImpl implements TweetDao {
         List<Tweet> list = new ArrayList<>();
         ResultSet rs = null;
         try {
-            conn = dbUtils.getConnection();
-            stmt = conn.prepareStatement(dbUtils.FIND_ALL_TWEET);
+            conn = DbUtils.getConnection();
+            stmt = conn.prepareStatement(DbUtils.FIND_ALL_TWEET);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -102,14 +98,14 @@ public class TweetDaoJdbcImpl implements TweetDao {
                 tweet.setUserId(rs.getLong("userId"));
                 tweet.setContent(rs.getString("content"));
                 tweet.setDatePosted(LocalDate.parse(rs.getString("datePosted")));
-                tweet.setReferenceTweet(rs.getLong("referenceTweet"));
+                tweet.setReferenceTweetId(rs.getLong("referenceTweet"));
                 list.add(tweet);
             }
         } catch (SQLException e) {
 
             throw new RuntimeException(e);
         } finally {
-            dbUtils.closeRsStCn(rs, stmt, conn);
+            DbUtils.closeResource(rs, stmt, conn);
         }
         return list;
     }

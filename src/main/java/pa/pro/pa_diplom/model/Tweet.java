@@ -1,26 +1,23 @@
 package pa.pro.pa_diplom.model;
 
-import javax.swing.text.AbstractDocument;
 import java.time.LocalDate;
 import java.util.*;
 
 public class Tweet {
 
-
-
     private Long tweetId;
     private Long userId;
-    private Long referenceTweet;
+    private Long referenceTweetId;
     private  LocalDate datePosted;
     private  String content;
     private  List<User> mentionedUsers;
     private List<User> likes;
     private List<Tweet> retweets;
 
-    public Tweet(Long userId, Long referenceTweet, String content) {
+    public Tweet(Long userId, Long referenceTweetId, String content) {
 
         this.userId = userId;
-        this.referenceTweet = referenceTweet;
+        this.referenceTweetId = referenceTweetId;
         this.datePosted = LocalDate.now();
         this.content = content;
         this.mentionedUsers = parseContentForMentions(content);
@@ -31,7 +28,7 @@ public class Tweet {
     public Tweet(Tweet other) {
         this.tweetId = other.tweetId;
         this.userId = other.userId;
-        this.referenceTweet = other.referenceTweet;
+        this.referenceTweetId = other.referenceTweetId;
         this.datePosted = other.datePosted;
         this.content = other.content;
         this.mentionedUsers = other.mentionedUsers;
@@ -71,12 +68,12 @@ public class Tweet {
         this.userId = userId;
     }
 
-    public Long getReferenceTweet() {
-        return referenceTweet;
+    public Long getReferenceTweetId() {
+        return referenceTweetId;
     }
 
-    public void setReferenceTweet(Long referenceTweet) {
-        this.referenceTweet = referenceTweet;
+    public void setReferenceTweetId(Long referenceTweetId) {
+        this.referenceTweetId = referenceTweetId;
     }
 
     public LocalDate getDatePosted() {
@@ -113,12 +110,12 @@ public class Tweet {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tweet tweet = (Tweet) o;
-        return Objects.equals(tweetId, tweet.tweetId) && userId.equals(tweet.userId) && Objects.equals(referenceTweet, tweet.referenceTweet) && datePosted.equals(tweet.datePosted) && Objects.equals(content, tweet.content);
+        return Objects.equals(tweetId, tweet.tweetId) && userId.equals(tweet.userId) && Objects.equals(referenceTweetId, tweet.referenceTweetId) && datePosted.equals(tweet.datePosted) && Objects.equals(content, tweet.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tweetId, userId, referenceTweet, datePosted, content);
+        return Objects.hash(tweetId, userId, referenceTweetId, datePosted, content);
     }
 
     @Override
@@ -126,7 +123,7 @@ public class Tweet {
         return "Tweet{" +
                 "tweetId=" + tweetId +
                 ", userId=" + userId +
-                ", referenceTweet=" + referenceTweet +
+                ", referenceTweet=" + referenceTweetId +
                 ", content='" + content + '\'' +
                 '}';
     }
