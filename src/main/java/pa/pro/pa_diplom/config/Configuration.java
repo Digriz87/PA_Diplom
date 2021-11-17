@@ -1,6 +1,5 @@
 package pa.pro.pa_diplom.config;
 
-import pa.pro.pa_diplom.persistance.jdbc.DbUtils;
 
 public class Configuration {
     private final DaoType daoType;
@@ -49,16 +48,24 @@ public class Configuration {
             throw new RuntimeException("SAD! not find a value for dao type");
         }
 
-        public ConfigBuilder initDb (Boolean initDb){
+        public ConfigBuilder initDb (Boolean value){
 
-            this.initDb = initDb;
+            this.initDb = value != null? value: false;
             return this;
             }
-        public ConfigBuilder populateDb (Boolean populateDb){
+        public ConfigBuilder populateDb (Boolean value){
 
-            this.populateDb = populateDb;
+            this.populateDb = value != null? value: false;
             return this;
         }
 
+        @Override
+        public String toString() {
+            return "ConfigBuilder{" +
+                    "daoType=" + daoType +
+                    ", initDb=" + initDb +
+                    ", populateDb=" + populateDb +
+                    '}';
         }
+    }
     }

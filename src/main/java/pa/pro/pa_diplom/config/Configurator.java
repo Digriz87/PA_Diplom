@@ -21,9 +21,6 @@ public class Configurator {
         log.info("Initializing APP...");
         log.info("CMD params: {}");
 
-
-
-
     }
 
     private static void initDb(Configuration configuration){

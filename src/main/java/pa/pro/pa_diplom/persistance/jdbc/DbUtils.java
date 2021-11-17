@@ -82,7 +82,7 @@ public  class DbUtils {
         log.info("Checking if DB initiated...");
         if (checkDbIsInitiated()) {
             log.info("DB is ok");
-            return;
+
         }
         log.info("Data base was not initiated...");
         log.info("Initiating Data Base...");
