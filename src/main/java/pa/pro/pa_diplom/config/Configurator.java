@@ -4,6 +4,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import pa.pro.pa_diplom.persistance.factory.DaoAbstractFactory;
+import pa.pro.pa_diplom.persistance.factory.TweetDaoFactoryImpl;
+import pa.pro.pa_diplom.persistance.factory.UserDaoFactoryImpl;
 import pa.pro.pa_diplom.persistance.jdbc.DbUtils;
 
 
@@ -16,46 +19,52 @@ public class Configurator {
     public static final String POPULATE_DB = "populateDb";
     private static Logger log = Logger.getLogger(Configurator.class.getName());
 
-    public static void initApp(String [] args){
+    public static void initApp(String[] args) {
         long start = System.currentTimeMillis();
         log.info("Initializing APP...");
         log.info("CMD params: {}");
+        Configuration config = createConfig(args);
+
+        log.info("Creating App context...");
+        DaoAbstractFactory factory = new DaoAbstractFactory(new UserDaoFactoryImpl(), new TweetDaoFactoryImpl(),config.getDaoType());
+
 
     }
 
-    private static void initDb(Configuration configuration){
-        if (configuration.initDb() && configuration.getDaoType() == DaoType.JDBC){
+    private static void initDb(Configuration configuration) {
+        if (configuration.initDb() && configuration.getDaoType() == DaoType.JDBC) {
             log.info("Creating new DB");
             DbUtils.initDb();
             log.info("New DB created");
 
         }
-        if (configuration.populateDb()){
+        if (configuration.populateDb()) {
             log.info("Population DB with sandbox data");
-            if (configuration.getDaoType() == DaoType.JDBC){
+            if (configuration.getDaoType() == DaoType.JDBC) {
                 DbUtils.populateJDBC();
-            } else if (configuration.getDaoType() == DaoType.IN_MEM){
+            } else if (configuration.getDaoType() == DaoType.IN_MEM) {
                 DbUtils.populateInMem();
             } else {
-                throw new RuntimeException("Could not recognize dao type");            }
+                throw new RuntimeException("Could not recognize dao type");
+            }
         }
         log.info("DB populated");
     }
 
-    private static Configuration createConfig(String [] args) {
+    private static Configuration createConfig(String[] args) {
         Options options = new Options();
         options.addRequiredOption("dt", DAO_TYPE, true, "choose dao type for this run");
-        options.addOption(INIT_DB,false,"flag for initial creation of the DB.");
-        options.addOption(POPULATE_DB, false,"flag for populations the DB with fake data");
+        options.addOption(INIT_DB, false, "flag for initial creation of the DB.");
+        options.addOption(POPULATE_DB, false, "flag for populations the DB with fake data");
         try {
             CommandLine cmd = new DefaultParser().parse(options, args);
-           Configuration configurator = Configuration.builder()
-                   .daoType(cmd.getOptionValue(DAO_TYPE))
-                   .initDb(cmd.hasOption(INIT_DB))
-                   .populateDb(cmd.hasOption(POPULATE_DB))
-                   .build();
-          log.info("Configuration building finished");
-          return configurator;
+            Configuration configurator = Configuration.builder()
+                    .daoType(cmd.getOptionValue(DAO_TYPE))
+                    .initDb(cmd.hasOption(INIT_DB))
+                    .populateDb(cmd.hasOption(POPULATE_DB))
+                    .build();
+            log.info("Configuration building finished");
+            return configurator;
 
         } catch (ParseException e) {
             e.printStackTrace();

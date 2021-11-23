@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-public  class DbUtils {
+public class DbUtils {
 
     private static final String TWITTER_DB_URL = "jdbc:sqlite:twitter_db";
     public static final String USER = "user";
@@ -40,36 +40,28 @@ public  class DbUtils {
 
     private static final List<String> TABLES = Arrays.asList(USER, TWEET, LIKES, FOLLOWERS);
 
-   static void closeResource(ResultSet rs, PreparedStatement statement1, AutoCloseable resource) {
+    static void closeResource(ResultSet rs, PreparedStatement statement1, AutoCloseable resource) {
         if (resource != null) {
-              try {
-                    resource.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-          }
-   }
+            try {
+                resource.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private static Logger log = Logger.getLogger(DbUtils.class.getName());
 
-    public static  Connection getConnection() {
+    public static Connection getConnection() {
         return getConnection(TWITTER_DB_URL);
     }
 
-    private static  Connection getConnection(String twitterDbUrl) {
+    private static Connection getConnection(String twitterDbUrl) {
         try {
             return DriverManager.getConnection(twitterDbUrl);
         } catch (SQLException throwable) {
             throwable.printStackTrace();
             return null;
-        }
-    }
-
-    public static void closeConnection(Connection connection) {
-        try {
-            connection.close();
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
         }
     }
 
@@ -89,31 +81,31 @@ public  class DbUtils {
         Connection connection = getConnection();
         String[] queries = parseQuery("src/main/resources/initDb.sql");
         runQuerySet(connection, queries);
-        if (!checkDbIsInitiated()){
+        if (!checkDbIsInitiated()) {
             throw new RuntimeException("Initializated of the DB Failed after an attempt!");
         }
     }
 
     private static void runQuerySet(Connection connection, String[] queries) {
         log.info("Checking if DB is initiated...");
-        for (String query: queries){
-            try (Statement statement = connection.createStatement()){
-               log.info("Running query: [{}]" + query);
-               statement.executeUpdate(query);
+        for (String query : queries) {
+            try (Statement statement = connection.createStatement()) {
+                log.info("Running query: [{}]" + query);
+                statement.executeUpdate(query);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
         }
     }
 
-    public static void populateJDBC(){
+    public static void populateJDBC() {
         log.info("Checking if DB is initiated...");
-        if (!checkDbIsInitiated()){
+        if (!checkDbIsInitiated()) {
             throw new RuntimeException("The DB is not initialized!");
         }
         log.info("Population SQL Data Base with sandbox data...");
         Connection connection = getConnection();
-        String [] queries = parseQuery("src/main/resources/sandBoxDataPopulation.sql");
+        String[] queries = parseQuery("src/main/resources/sandBoxDataPopulation.sql");
         runQuerySet(connection, queries);
         log.info("Good! DB has been populated with fake data!");
     }
@@ -136,12 +128,12 @@ public  class DbUtils {
         return result;
     }
 
-    public static void populateInMem(){
+    public static void populateInMem() {
         log.info("Population in memory Data Base with sandbox data...");
-        User bilbo = new User(1L, LocalDate.now(), "Bilbo", LocalDate.of(1987,12,12), "I was first of owner ring");
-        User legolas = new User(5L, LocalDate.now(), "Legolas", LocalDate.of(1987,12,12), "Nay, time does not tarry ever, but change and growth is not in all things and places alike");
-        User frodo = new User(2L, LocalDate.now(), "Frodo", LocalDate.of(1987,12,12), "I`m second of owner ring");
-        User sauron = new User(4L, LocalDate.now(), "Sauron", LocalDate.of(1987,12,12), "Lord");
+        User bilbo = new User(1L, LocalDate.now(), "Bilbo", LocalDate.of(1987, 12, 12), "I was first of owner ring");
+        User legolas = new User(5L, LocalDate.now(), "Legolas", LocalDate.of(1987, 12, 12), "Nay, time does not tarry ever, but change and growth is not in all things and places alike");
+        User frodo = new User(2L, LocalDate.now(), "Frodo", LocalDate.of(1987, 12, 12), "I`m second of owner ring");
+        User sauron = new User(4L, LocalDate.now(), "Sauron", LocalDate.of(1987, 12, 12), "Lord");
 
         UserDao userDao = new UserDaoInMemImpl();
         userDao.save(bilbo);
@@ -155,12 +147,12 @@ public  class DbUtils {
         Tweet tweetReply3 = new Tweet(frodo.getUserId(), 3L, "Bilbo you are very old, you need a rest");
         Tweet tweetReply4 = new Tweet(sauron.getUserId(), 4L, "You cannot hide. I see you. There is no life in the void, only death");
 
-         TweetDao tweetDao = new TweetDaoInMemImpl();
+        TweetDao tweetDao = new TweetDaoInMemImpl();
         tweetDao.saveTweet(tweet);
-          tweetDao.saveTweet(tweetReply1);
-         tweetDao.saveTweet(tweetReply2);
-          tweetDao.saveTweet(tweetReply3);
-          tweetDao.saveTweet(tweetReply4);
+        tweetDao.saveTweet(tweetReply1);
+        tweetDao.saveTweet(tweetReply2);
+        tweetDao.saveTweet(tweetReply3);
+        tweetDao.saveTweet(tweetReply4);
 
 
     }
